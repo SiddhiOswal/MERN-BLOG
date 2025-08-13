@@ -2,6 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "blog application",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.js"
@@ -18,8 +19,14 @@
     "prettier": "^3.6.2"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.7.0",
     "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
     "mongodb": "^6.18.0",
-    "mongoose": "^8.17.0"
+    "mongoose": "^8.17.0",
+    "multer": "^2.0.2",
+    "validator": "^13.15.15"
   }
 }
