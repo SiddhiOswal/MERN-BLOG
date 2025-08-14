@@ -4,7 +4,7 @@ import validator from 'validator'
 import bcrypt from 'bcryptjs'
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import User from "../models/user.model.js";
-
+import jwt from "jsonwebtoken";
 
 const register = async (req, res) => {
     try {
@@ -72,8 +72,58 @@ const register = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
-    //logic
-}
+    try {
+        const {userName, email, password} = req.body;
+
+        if(!userName || !email || !password){
+            throw new ApiError(400, "All fields are mandatory")
+        }
+
+        if (!validator.isEmail(email)) {
+            throw new ApiError(400, "email invalid")
+        }
+
+        const isExistUser = await User.findOne({ $or: [{ userName : userName.trim() }, {email : email.trim() }] });
+        
+        if(!isExistUser) {
+            throw new ApiError(400, "User not found")
+        }
+
+        const comparePass = bcrypt.compareSync(password, isExistUser.password); 
+
+        if(!comparePass) {
+            throw new ApiError(400, "Invalid password")
+        }
+
+        const token = jwt.sign({ id: isExistUser._id }, process.env.ACCESS_TOKEN_SECRET);
+
+        if(!token){
+            throw new ApiError(400, "token not found")
+        }
+
+        const loggedInUser = await User.findById(isExistUser._id).select(" -password");
+    
+        const options = {
+            httpOnly: true,
+            secure: false,
+        };
+
+        return res
+        .status(200)
+        .cookie("accessToken", token,options)
+        .json(new ApiResponse(
+            200,
+            {
+                loggedInUser,
+                token
+            },
+            "User logged in successfullly"
+        ))
+    
+    } catch (error) {
+        throw new ApiError(400, error);
+    }
+};  
 
 const signOut = async (req, res) => {
     //logic

@@ -7,7 +7,7 @@ dotenv.config({
 
 import express from "express";
 const app = express();
-
+app.use(express.json({limit: "16kb"}))
 
 
 import connectDB from './db/databaseCollection.js';
