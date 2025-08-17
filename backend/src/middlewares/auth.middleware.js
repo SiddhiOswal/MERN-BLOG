@@ -1,5 +1,6 @@
 import { ApiError } from "../utils/apiError.js";
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken"
 
 const verifyJWT = async(req, res, next) => {
     try{
@@ -14,7 +15,7 @@ const verifyJWT = async(req, res, next) => {
         if(!decodedToken){
             throw new ApiError(400, "Invalid access token")
         }
-        const user = User.findOne(decodedToken?._id).select(" -password")
+        const user = await User.findById(decodedToken?.id).select(" -password")
 
         if(!user) {
             throw new ApiError(400,"Invalid user");
@@ -23,7 +24,7 @@ const verifyJWT = async(req, res, next) => {
         req.user = user;
         next();
     }catch(error){
-        throw new ApiError(400, "something went wrong",error)
+        throw new ApiError(400, error.message)
     }
 }
 

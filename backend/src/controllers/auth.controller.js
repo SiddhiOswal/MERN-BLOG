@@ -121,12 +121,27 @@ const signIn = async (req, res) => {
         ))
     
     } catch (error) {
-        throw new ApiError(400, error);
+        throw new ApiError(400, error.message);
     }
 };  
 
 const signOut = async (req, res) => {
-    //logic
+    try {
+        const options = {
+            httpOnly: true,
+            secure: false,
+        };
+
+        return res.status(200)
+        .clearCookie("accessToken", options)
+        .json(new ApiResponse(
+            200,
+            {},
+            "User logout successful"
+        ))
+    } catch (error) {
+        throw new ApiError(400,error.message)
+    }
 }
 
 
